@@ -7,12 +7,12 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import lombok.val;
 
 import java.util.function.Supplier;
-
 public class ElasticSearchUtil {
+    private ElasticSearchUtil() {
+    }
 
     public static Supplier<Query> supplier(){
-        Supplier<Query> supplier = ()->Query.of(q->q.matchAll(matchAllQuery()));
-        return supplier;
+        return ()->Query.of(q->q.matchAll(matchAllQuery()));
     }
 
     public static MatchAllQuery matchAllQuery(){
@@ -21,8 +21,7 @@ public class ElasticSearchUtil {
     }
 
     public static Supplier<Query> supplierWithNameField(String fieldValue){
-        Supplier<Query> supplier = ()->Query.of(q->q.match(matchQueryWithNameField(fieldValue)));
-        return supplier;
+        return ()->Query.of(q->q.match(matchQueryWithNameField(fieldValue)));
     }
 
     public static MatchQuery matchQueryWithNameField(String fieldValue){

@@ -1,5 +1,6 @@
 package com.elastic.service;
 
+import com.elastic.exception.ProductNotFoundException;
 import com.elastic.model.Product;
 import com.elastic.repository.ProductRepo;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +22,9 @@ public class ProductService {
         return productRepo.save(product);
     }
 
-    public Product updateProduct(Product product, int id) {
+    public Product updateProduct(Product product, int id) throws ProductNotFoundException {
         Optional<Product> optionalProduct = productRepo.findById(id);
-        Product updatedProduct = null;
+        Product updatedProduct ;
 
         if (optionalProduct.isPresent()) {
             Product existingProduct = optionalProduct.get();
@@ -39,16 +40,16 @@ public class ProductService {
 
             return productRepo.save(updatedProduct);
         }
-        throw new RuntimeException("Product with id " + id + " not found.");
+        throw new ProductNotFoundException("Product with id " + id + " not found.");
     }
 
 
-    public void deleteProduct(int id) {
+    public void deleteProduct(int id) throws ProductNotFoundException {
         Optional<Product> optionalProduct = productRepo.findById(id);
         if (optionalProduct.isPresent()) {
             productRepo.deleteById(id);
         } else {
-            throw new RuntimeException("Product with id " + id + " not found.");
+            throw new ProductNotFoundException("Product with id " + id + " not found.");
         }
     }
 }

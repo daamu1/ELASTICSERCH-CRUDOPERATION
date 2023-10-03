@@ -8,6 +8,7 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.elastic.model.Product;
 import com.elastic.util.ElasticSearchUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,32 +18,31 @@ import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ElasticSearchService {
 
     @Autowired
-    private ElasticsearchClient  elasticsearchClient;
+    ElasticsearchClient elasticsearchClient;
 
     public SearchResponse<Map> matchAllServices() throws IOException {
-        Supplier<Query> supplier  = ElasticSearchUtil.supplier();
-        SearchResponse<Map> searchResponse = elasticsearchClient.search(s->s.query(supplier.get()),Map.class);
-        System.out.println("elasticsearch query is "+supplier.get().toString());
-        return searchResponse;
+        Supplier<Query> supplier = ElasticSearchUtil.supplier();
+        return elasticsearchClient.search(s -> s.query(supplier.get()), Map.class);
     }
     //matchAllProducts  content
 
     public SearchResponse<Product> matchAllProductsServices() throws IOException {
-        Supplier<Query> supplier  = ElasticSearchUtil.supplier();
-        SearchResponse<Product> searchResponse = elasticsearchClient.search(s->s.index("products").query(supplier.get()),Product.class);
-        System.out.println("elasticsearch query is "+supplier.get().toString());
+        Supplier<Query> supplier = ElasticSearchUtil.supplier();
+        SearchResponse<Product> searchResponse = elasticsearchClient.search(s -> s.index("products").query(supplier.get()), Product.class);
+        log.info("elasticsearch query is " + supplier.get().toString());
         return searchResponse;
     }
 
     //matchProductWithName
 
     public SearchResponse<Product> matchProductsWithName(String fieldValue) throws IOException {
-        Supplier<Query> supplier  = ElasticSearchUtil.supplierWithNameField(fieldValue);
-        SearchResponse<Product> searchResponse = elasticsearchClient.search(s->s.index("products").query(supplier.get()),Product.class);
-        System.out.println("elasticsearch query is "+supplier.get().toString());
+        Supplier<Query> supplier = ElasticSearchUtil.supplierWithNameField(fieldValue);
+        SearchResponse<Product> searchResponse = elasticsearchClient.search(s -> s.index("products").query(supplier.get()), Product.class);
+        log.info("elasticsearch query is " + supplier.get().toString());
         return searchResponse;
     }
 }
