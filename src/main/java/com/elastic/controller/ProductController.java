@@ -6,11 +6,13 @@ import com.elastic.model.Product;
 import com.elastic.service.ElasticSearchService;
 import com.elastic.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,9 +28,10 @@ public class ProductController {
     private ElasticSearchService elasticSearchService;
 
     @GetMapping("/findAll")
-    public ResponseEntity<Iterable<Product>> findAll() {
-        Iterable<Product> products = productService.getAllProducts();
-        return new ResponseEntity<>(products, HttpStatus.OK);
+    public ResponseEntity<Page<Product>>getAllProducts(@RequestParam(defaultValue = "0") int page,
+                                                       @RequestParam(defaultValue = "10") int size) {
+        Page<Product> allProducts = productService.getAllProducts(page, size);
+        return new ResponseEntity<>(allProducts, HttpStatus.OK);
     }
 
     @PostMapping("/insert")
@@ -78,4 +81,16 @@ public class ProductController {
         }
         return new ResponseEntity<>(listOfProducts, HttpStatus.OK);
     }
+
+    @GetMapping("/matchAllProducts/date/{fieldValue}")
+    public ResponseEntity<List<Product>> matchProductsWithPurchasedAt(@PathVariable LocalDateTime fieldValue) throws IOException {
+        SearchResponse<Product> searchResponse = elasticSearchService.matchProductsWithPurchasedAt(fieldValue);
+        List<Hit<Product>> listOfHits = searchResponse.hits().hits();
+        List<Product> listOfProducts = new ArrayList<>();
+        for (Hit<Product> hit : listOfHits) {
+            listOfProducts.add(hit.source());
+        }
+        return new ResponseEntity<>(listOfProducts, HttpStatus.OK);
+    }
+
 }

@@ -6,6 +6,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import lombok.val;
 
+import java.time.LocalDateTime;
 import java.util.function.Supplier;
 public class ElasticSearchUtil {
     private ElasticSearchUtil() {
@@ -27,5 +28,14 @@ public class ElasticSearchUtil {
     public static MatchQuery matchQueryWithNameField(String fieldValue){
         val  matchQuery = new MatchQuery.Builder();
         return matchQuery.field("name").query(fieldValue).build();
+    }
+
+    public static Supplier<Query> supplierWithDate(LocalDateTime localDateTime) {
+        MatchQuery matchQuery = new MatchQuery.Builder()
+                .field("purchasedAt")
+                .query(localDateTime.toString()) // Assuming LocalDateTime is converted to a string
+                .build();
+
+        return matchQuery::_toQuery;
     }
 }

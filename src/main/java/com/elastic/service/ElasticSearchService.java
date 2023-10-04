@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -45,4 +46,11 @@ public class ElasticSearchService {
         log.info("elasticsearch query is " + supplier.get().toString());
         return searchResponse;
     }
+    public SearchResponse<Product> matchProductsWithPurchasedAt(LocalDateTime localDateTime) throws IOException {
+        Supplier<Query> supplier = ElasticSearchUtil.supplierWithDate(localDateTime);
+        SearchResponse<Product> searchResponse = elasticsearchClient.search(s -> s.index("products").query(supplier.get()), Product.class);
+        log.info("elasticsearch query is " + supplier.get().toString());
+        return searchResponse;
+    }
+
 }

@@ -2,8 +2,11 @@ package com.elastic.service;
 
 import com.elastic.exception.ProductNotFoundException;
 import com.elastic.model.Product;
-import com.elastic.repository.ProductRepo;
+import com.elastic.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -12,18 +15,19 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductService {
 
-    private final ProductRepo productRepo;
+    private final ProductRepository productRepository;
 
-    public Iterable<Product> getAllProducts() {
-        return productRepo.findAll();
+    public Page<Product> getAllProducts(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return productRepository.findAll(pageable);
     }
 
     public Product insertProduct(Product product) {
-        return productRepo.save(product);
+        return productRepository.save(product);
     }
 
     public Product updateProduct(Product product, int id) throws ProductNotFoundException {
-        Optional<Product> optionalProduct = productRepo.findById(id);
+        Optional<Product> optionalProduct = productRepository.findById(id);
         Product updatedProduct ;
 
         if (optionalProduct.isPresent()) {
@@ -38,16 +42,16 @@ public class ProductService {
                     .price(product.getPrice())
                     .build();
 
-            return productRepo.save(updatedProduct);
+            return productRepository.save(updatedProduct);
         }
         throw new ProductNotFoundException("Product with id " + id + " not found.");
     }
 
 
     public void deleteProduct(int id) throws ProductNotFoundException {
-        Optional<Product> optionalProduct = productRepo.findById(id);
+        Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
-            productRepo.deleteById(id);
+            productRepository.deleteById(id);
         } else {
             throw new ProductNotFoundException("Product with id " + id + " not found.");
         }
